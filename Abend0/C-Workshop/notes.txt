@@ -1,0 +1,37 @@
+History
+- K&R
+- for Unix
+- K&R C → (ANSI-C → C89/90) → C99 → C11
+
+Basics
+- Hello World
+ + main function
+ + blocks
+ + printf()
+- variables
+ + scalar types
+ + scope
+ + casts
+- loops
+- conditionals
+- logical operations
+- arithmetic operations
+- functions
+ + declaration
+ + prototype
+ + definition
+
+Advanced
+- bit operations
+- arrays
+- structs
+- initializers
+- enums
+- pointer
+- compound literals
+
+Tasks
+- faculty
+- fibonacci (iterative)
+- primes
+- "database" (structs)
