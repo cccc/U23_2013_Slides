@@ -45,7 +45,7 @@ morekeywords={size_t, _Bool, uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32
 
 \title{U23 C Workshop}
 
-\author[Florian Zeitz <florob@babelmonkeys.de>]{Florian Zeitz}
+\author[Florian Zeitz <florob@babelmonkeys.de>]{Florian ``Florob'' Zeitz}
 
 \institute[Chaos Computer Club Cologne]
 {
@@ -315,7 +315,7 @@ http://koeln.ccc.de \\
 \end{frame}
 
 \begin{frame}[fragile]{printf()}
-	\begin{lstlisting}
+	\begin{lstlisting}[numbers=none]
 		int printf(const char *fmt, ...);
 	\end{lstlisting}
 	\begin{itemize}
@@ -328,6 +328,19 @@ http://koeln.ccc.de \\
 	\end{itemize}
 \end{frame}
 
+\begin{frame}{Escape sequences}
+	\begin{itemize}
+		\item[\textbackslash n] new line
+		\item[\textbackslash r] carriage return
+		\item[\textbackslash t] horizontal tab
+		\item[\textbackslash\textbackslash] backslash
+		\item[\textbackslash '] single quote
+		\item[\textbackslash "] double quote
+		\item[\textbackslash \textit{<oct>}] ASCII character \textit{<oct>}
+		\item[\textbackslash x\textit{<hex>}] ASCII character \textit{<hex>}
+	\end{itemize}
+\end{frame}
+
 \begin{frame}[fragile]{printf()}
 	\begin{lstlisting}[escapechar=]
 		int main(void) {
@@ -336,9 +349,7 @@ http://koeln.ccc.de \\
 		  return 0;
 		}
 	\end{lstlisting}
-	\begin{itemize}
-		\item Prints: \verb|a: 8|
-	\end{itemize}
+	Output: \verb|a: 8|
 \end{frame}
 
 \subsection{Logical Operations}
@@ -534,7 +545,7 @@ http://koeln.ccc.de \\
 \end{frame}
 
 \begin{frame}[fragile]{Declaration and Prototype}
-	\begin{lstlisting}
+	\begin{lstlisting}[numbers=none]
 		%{\it\color{blue}type1}% func(%{\it\color{blue}{type2}% param1);
 	\end{lstlisting}
 	\begin{itemize}
@@ -547,7 +558,7 @@ http://koeln.ccc.de \\
 \end{frame}
 
 \begin{frame}[fragile]{Definition}
-	\begin{lstlisting}
+	\begin{lstlisting}[numbers=none]
 		%{\it\color{blue}type1}% func(%{\it\color{blue}{type2}% param1)
 		  $block$
 	\end{lstlisting}
