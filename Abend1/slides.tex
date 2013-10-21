@@ -202,8 +202,20 @@ http://koeln.ccc.de \\
 	\begin{itemize}
 		\item Übernimmt Startup-Krempel und springt in main()
 		\item Stell das Buildsystem zur Verfügung (Makefiles)
-		\item Ihr könnt unseren Code benutzen, müsst aber nicht wenn ihr euch sicher seid, dass es ohne geht
 		\item Zu finden unter \url{https://github.com/cccc/U23_2013_examples}
+		\item Beim Bauen wird ein Fehler bei stlink-trace auftreten (libncurses nicht gefunden)
+		\item \emph{sudo apt-get install libncurses-dev} behebt das in der VM
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Linux Setup}
+	\begin{itemize}
+		\item Dependencies siehe README.md
+		\item libncurses (und das -dev Paket dazu) installieren, fehlt in der README
+		\item gcc-arm-embedded muss im \emph{PATH} liegen
+		\item Zusätzlich noch git und make installieren
+		\item Dann sollte das einfach so funktionieren (Magie!)
 	\end{itemize}
 \end{frame}
 
