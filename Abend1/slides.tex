@@ -203,8 +203,7 @@ http://koeln.ccc.de \\
 		\item Übernimmt Startup-Krempel und springt in main()
 		\item Stell das Buildsystem zur Verfügung (Makefiles)
 		\item Ihr könnt unseren Code benutzen, müsst aber nicht wenn ihr euch sicher seid, dass es ohne geht
-		\item Zu finden unter \url{git://github.com/cccc/U23_2013_examples.git}
-		\item In der VM auf dem Desktop
+		\item Zu finden unter \url{https://github.com/cccc/U23_2013_examples}
 	\end{itemize}
 \end{frame}
 
@@ -213,22 +212,25 @@ http://koeln.ccc.de \\
 	\begin{columns}
 			\column{3in}
 	\begin{itemize}
+		\item[apps/] Eure selbstgeschriebenen Apps
 		\item[bare\_metal/] Beispiele ohne unsere lib
 		\item[build/] Makefiles für das Buildsystem
 		\item[docs/] Dokumentation, Datasheets, Schaltplan des Boards
 		\item[tools/] Utilities (stlink-trace)
-		\item[u23\_lib/] Unsere Libraries
-		\item[u32\_lib/examples/] Beispielprogramme die unsere Library nutzen
-		\item[u32\_lib/libs/] Die Libraries
+		\item[examples/] Beispielprogramme die unsere Library nutzen
+		\item[libs/] Die Startup- und Peripherie-Libraries
 	\end{itemize}
 	\end{columns}
 \end{frame}
 
 \begin{frame}
 	\frametitle{Neues Projekt anlegen}
-	\begin{itemize}
-		\item TODO TODO TODO
-	\end{itemize}
+	\begin{enumerate}
+		\item Kopiert den Ordner \emph{hello\_word} in \emph{apps}
+		\item Öffnet die Datei \emph{target.mak} in eurem \textbf{grade kopierten Ordner} und ändert die Variable \emph{TARGET} so, dass sie genau so heisst wie euer neuer Ordner
+		\item Öffnet im Ordner \emph{apps} die Datei \emph{target.mak} und fügt zur Variable \emph{SUBDIRS} euren neuen (getrennt durch Leerzeichen) Ordnernamen hinzu
+		\item Ihr könnt jetzt Sourcecode hinzufügen oder schreiben. Solltet ihr neue Dateien haben, die ihr kompilieren wollt, tragt sie in die Variable \emph{CCSOURCES} in der \emph{target.mak} ein.
+	\end{enumerate}
 \end{frame}
 
 \begin{frame}
@@ -281,15 +283,35 @@ Breakpoint 1, main () at /home/andy/Documents/CCC/U23_2013/examples/u23_lib/exam
 (gdb) <weitere Befehle> 
 [...]
 	\end{lstlisting}
-	Alternativ Eclipse. Gordin?
+	Alternativ Eclipse. Gordin? Ach, sowas will doch niemand...
 \end{frame}
 
 \subsection{Codesamples}
 
 \begin{frame}[fragile]
-	\frametitle{Ein neues Spiel}
+	\frametitle{Ein neues Programm}
 	\begin{lstlisting} [language=C]
-Hello, World!!1!
+#include <System.h>
+#include <stdio.h>
+
+int main()
+{
+    // Do some basic initialization tasks
+    InitializeSystem();
+
+    // Initialize pins for LEDs
+    InitializeLEDs();
+
+    // Enable printf via trace macrocell (get output with 'make trace')
+    EnableDebugOutput(DEBUG_ITM);
+
+    //Turn on all LEDs
+    SetLEDs(1 | 2 | 4 | 8);
+
+    iprintf("Hello, World!\r\n");
+
+    while(1);
+}
 	\end{lstlisting}
 \end{frame}
 
@@ -314,7 +336,32 @@ Hello, World!!1!
 \begin{frame} [fragile]
 	\frametitle{Accelerometer Demo-Code}
 	\begin{lstlisting} [language=C]
-Hello, ACC
+#include <System.h>
+#include <Accelerometer.h>
+
+int main()
+{
+    // Do some basic initialization tasks
+    InitializeSystem();
+
+    // Initialize pins for Accelerometer
+    InitializeAccelerometer();
+
+    // Calibrate the Accelerometer on the Start
+    CalibrateAccelerometer();
+
+    while (1)
+    {
+        int led = 0;
+        int8_t Data[3] = {};
+
+        // Read new Data
+        ReadCalibratedAccelerometerData(Data);
+
+        //... do some fancy WiiMote-Style shit ...
+    }
+}
+
 	\end{lstlisting}
 \end{frame}
 
@@ -335,19 +382,6 @@ Hello, ACC
 		\item Danach kann man \emph{printf()} benutzen
 		\item Benutzt wird UART2 mit TX-Pin PA2 und RX-Pin PA3
 	\end{itemize}
-\end{frame}
-
-\begin{frame}
-	\frametitle{Aufgaben}
-	\begin{enumerate}
-		\item Besorgt euch die Library
-		\item Kompiliert sie ein mal
-		\item Legt ein neues Projekt an
-		\item Lasst LEDs blinken
-		\item Gebt euch mal Debugging output aus (per ITM)
-		\item Vielleicht schafft ihr es schon Accelerometerwerte per Debugoutput auszugeben
-		\item Probiert mal mit dem GDB zu Debuggen
-	\end{enumerate}
 \end{frame}
 
 
@@ -477,11 +511,23 @@ rm 'testfile'
 \end{frame}
 
 \begin{frame}
+	\frametitle{Remotes}
+	\begin{itemize}
+		\item Remotes sind Zeiger auf andere Repositories des selben Projekts
+		\item Ihr könnt dahin pushen (falls ihr dir Rechte habt) oder davon pullen
+		\item Der C4 hat ein Repo, ihr habt alle Repos
+		\item Ihr pusht also immer nur in euer eigenes Repo und pullt von allen anderen in eurem Team oder vom C4 um ihre neuen Änderungen zu bekommen
+		\item Remote hinzufügen geht so: \emph{git remote add <remotename> <remoteurl>}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
 	\frametitle{git push}
 	\begin{itemize}
 		\item Schiebt eigene Änderungen auf den Server
 		\item Server ist nicht zwingend notwendig, aber praktisch um Änderungen zu verteilen
-		\item Kann sein, dass es abgelehnt wird, dann einmal pullen und wieder pushen
+		\item Wenn jemand anders in der Zwischenzeit Änderungen gepusht hat, die ihr noch nicht habt, kann es sein, dass es abgelehnt wird -- dann einmal pullen (ggf. mergen) und wieder pushen
+		\item Beispiel: \emph{git push [remote [branchname]]}
 	\end{itemize}
 \end{frame}
 
@@ -489,6 +535,7 @@ rm 'testfile'
 	\frametitle{git pull}
 	\begin{itemize}
 		\item Holt Änderungen vom Server
+		\item Beispiel: \emph{git push [remote [branchname]]}
 	\end{itemize}
 \end{frame}
 
@@ -500,22 +547,22 @@ rm 'testfile'
 	\end{itemize}
 \end{frame}
 
-\end{document}
-
-
 \section{Aufgaben}
-
 \subsection{Aufgaben}
 \begin{frame}
-	%\frametitle{Erfa-Kreise}
+	\frametitle{Aufgaben}
 	\begin{enumerate}
-		\item Holt euch ein Board + USB-Kabel
-		\item Besorgt euch die VM + VMware Player
-		\item Kriegt die VM ans laufen
-		\item Versucht die Library auf der Commandline zu kompilieren
-		\item Versucht das Blink-Example zu flashen
-		\item Erstellt ein neues Projekt
-		\item Lasst etwas Debugoutput ausgeben
-		\item Testet den Debugoutput mit stlink-trace
+		\item Falls ihr noch kein Board habt, geht zum Andy und holt euch eins
+		\item Legt euch nen github Account an
+		\item Forkt das U23 Projekt des C4s (C4-Account: cccc)
+		\item Clonet euren neuen Fork
+		\item Fügt das C4-Repo als upstream remote hinzu (\emph{git remote add upstream \url{https://github.com/cccc/U23_2013_examples.git}})
+		\item Legt ein neues Projekt an
+		\item Lasst LEDs blinken
+		\item Gebt euch mal Debugging output aus (per ITM)
+		\item Vielleicht schafft ihr es schon Accelerometerwerte per Debugoutput auszugeben
+		\item Probiert mal mit dem GDB zu Debuggen
 	\end{enumerate}
 \end{frame}
+
+\end{document}
