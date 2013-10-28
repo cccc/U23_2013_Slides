@@ -1,0 +1,362 @@
+\documentclass[ngerman,compress]{beamer}
+
+\mode<presentation>
+{
+  \useoutertheme[footline=titleinstituteauthor]{c4}
+  \useinnertheme{circles}
+  \usecolortheme{c4}
+  %\setbeamercovered{transparent}
+  \setbeamercovered{highly dynamic}
+}
+
+\usepackage{babel}
+\usepackage[utf8]{luainputenc}
+\usepackage{fontspec}
+\usepackage{listings}
+\usepackage{color}
+
+% Multimedia
+%\usepackage{multimedia}
+
+% sets the listings style
+\definecolor{sh_comment}{rgb}{0.12, 0.38, 0.18 } %adjusted, in Eclipse: {0.25, 0.42, 0.30 } = #3F6A4D
+\definecolor{sh_keyword}{rgb}{0.3, 0.3, 0.875}  % #5F1441
+\definecolor{sh_string}{rgb}{0.875, 0.85, 0.11} % #101AF9
+
+\lstset{basicstyle=\tiny\ttfamily,
+	showspaces=false,
+	showtabs=false, 
+	showstringspaces=false, 
+	columns=fullflexible, 
+	stringstyle=\color{sh_string},
+	keywordstyle=\color{sh_keyword}\bfseries,
+	commentstyle=\color{sh_comment}\itshape
+	}
+
+\title[STM32 - GPIO und Timer - u23 2013]
+{\textbf{STM32 - GPIO und Timer}\\u23 2013}
+
+\author[andy <andy@koeln.ccc.de>]
+{andy, florob, gordin, ike, meise, tobix, zakx}
+
+\institute[Chaos Computer Club Cologne]
+{
+Chaos Computer Club Cologne e.V.\\
+http://koeln.ccc.de \\
+}
+
+\date{Cologne\\2013-10-28}
+
+\pgfdeclareimage[height=1cm]{barcode}{./c4-logo}
+\logo{\pgfuseimage{barcode}}
+
+
+% Folgendes sollte gelC6scht werden, wenn man nicht am Anfang jedes
+% Unterabschnitts die Gliederung nochmal sehen möchte.
+%\AtBeginSection[]
+%{
+%  \begin{frame}<beamer>
+%    \frametitle{Gliederung}
+%    \tableofcontents[currentsection,currentsubsection]
+%  \end{frame}
+%}
+
+% Falls Aufzählungen immer schrittweise gezeigt werden sollen, kann
+% folgendes Kommando benutzt werden:
+%\beamerdefaultoverlayspecification{<+->}
+
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\AtBeginSubsection
+
+\begin{frame}
+  \tableofcontents
+  % Die Option [pausesections] könnte nützlich sein.
+\end{frame}
+
+
+\section{GPIO}
+
+\subsection{GPIOs}
+
+\begin{frame}
+	\frametitle{GPIO}
+	\begin{itemize}
+		\item GPIO = \textbf{G}eneral \textbf{P}urpose \textbf{I}nput/\textbf{O}utput
+		\item = durch Software wackelnde Pins am Mikrocontroller
+		\item Kennen zwei Modi: Input und Output
+		\item Standardkonfiguration eines Pins = GPIO Input
+		\item STM32F4 hat GPIOA bis GPIOI mit je 16 Pins (ne Menge!)
+		\item Als Vergleich Atmega32: GPIOA bis GPIOD mit je 8 Pins
+	\end{itemize}
+\end{frame}
+
+\begin{frame} [fragile]
+	\frametitle{Konfiguration}
+	Der Kram muss konfiguriert werden:
+	\begin{lstlisting} [language=C]
+	GPIO_InitTypeDef  GPIO_InitStructure;
+
+	/* Enable the GPIO_LED Clock */
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
+
+	/* Configure the GPIO_LED pins */
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	GPIO_Init(GPIOD, &GPIO_InitStructure);
+	\end{lstlisting}
+\end{frame}
+
+\begin{frame} [fragile]
+	\frametitle{Der Reihe nach (1)}
+	Clock einschalten, damit der GPIO-Kern irgendwas tut:
+	\begin{lstlisting} [language=C, basicstyle=\small]
+	/* Enable the GPIO Clock */
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOD, ENABLE);
+	\end{lstlisting}
+\end{frame}
+
+\begin{frame} [fragile]
+	\frametitle{Der Reihe nach (2)}
+	Wir konfigurieren hier Pins 12 bis 15 ...
+	\begin{lstlisting} [language=C, basicstyle=\small, breaklines=true]
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
+	\end{lstlisting}
+	\pause
+	... als Ausgänge
+	\begin{lstlisting} [language=C, basicstyle=\small]
+	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+	\end{lstlisting}
+	\pause
+	... im Modus Push/Pull ...
+	\begin{lstlisting} [language=C, basicstyle=\small]
+	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+	\end{lstlisting}
+\end{frame}
+
+\begin{frame} [fragile]
+	\frametitle{Der Reihe nach (3)}
+	... mit aktiviertem Pullup (eigentlich sinnfrei bei Ausgängen) ...
+	\begin{lstlisting} [language=C, basicstyle=\small]
+	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
+	\end{lstlisting}
+	\pause
+	... und max. 50 MHz Geschwindigkeit
+	\begin{lstlisting} [language=C, basicstyle=\small]
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+	\end{lstlisting}
+	\pause
+	BÄM!
+	\begin{lstlisting} [language=C, basicstyle=\small]
+	GPIO_Init(GPIOD, &GPIO_InitStructure);
+	\end{lstlisting}
+\end{frame}
+
+\begin{frame} [fragile]
+	\frametitle{Pins nutzen}
+	So setzt man Pins:
+	\begin{lstlisting} [language=C, basicstyle=\small]
+	GPIO_SetBits(GPIOD, GPIO_Pin_12 | GPIO_Pin_15);
+	\end{lstlisting}
+	\pause
+	So löscht man Pins:
+	\begin{lstlisting} [language=C, basicstyle=\small]
+	GPIO_ResetBits(GPIOD, GPIO_Pin_13 | GPIO_Pin_14);
+	\end{lstlisting}
+	\pause
+	So liest man Pins:
+	\begin{lstlisting} [language=C, basicstyle=\small]
+	if(GPIO_ReadInputDataBit(GPIOA, GPIO_Pin_0) == Bit_SET)
+	{
+		...
+	}
+	\end{lstlisting}
+	Noch mehr, lest das mal selbst nach: \emph{stm32f4xx\_gpio.h}
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{Pullup/down Widerstände}
+	Annahme: Wir klemmen einen Schalter an einen Input an.
+	\includegraphics[height=1.5in]{keinpullupdown.png}
+	\begin{enumerate}
+		\item Welchen Pegel hat der Mikrocontrollerpin, wenn der Schalter geschlossen ist?
+		\item Welchen Pegel hat der Mikrocontrollerpin, wenn der Schalter offen ist?
+	\end{enumerate}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Pullup-Widerstand}
+	\includegraphics[height=1.5in]{Pullup.png}
+	\begin{enumerate}
+		\item Welchen Pegel hat der Mikrocontrollerpin, wenn der Schalter geschlossen ist?
+		\item Welchen Pegel hat der Mikrocontrollerpin, wenn der Schalter offen ist?
+	\end{enumerate}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Pulldown-Widerstand}
+	\includegraphics[height=1.5in]{Pulldown.png}
+	\begin{enumerate}
+		\item Welchen Pegel hat der Mikrocontrollerpin, wenn der Schalter geschlossen ist?
+		\item Welchen Pegel hat der Mikrocontrollerpin, wenn der Schalter offen ist?
+	\end{enumerate}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Pinmodi}
+	\emph{GPIO\_Mode} ist ziemlich selbsterklärend:
+	\begin{itemize}
+		\item \emph{GPIO\_Mode\_IN} -- Input
+		\item \emph{GPIO\_Mode\_OUT} -- Output
+		\item \emph{GPIO\_Mode\_AF} -- Auxiliary Function
+		\item \emph{GPIO\_Mode\_AN} -- Analog Input
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Pinmodi}
+	\emph{GPIO\_OType} (O = Output) kennt nur zwei Modi:
+	\begin{itemize}
+		\item \emph{GPIO\_OType\_PP} -- Push/Pull = hartes ziehen oder drücken auf 0V oder 3,3V
+		\item \emph{GPIO\_OType\_OD} -- OpenDrain = hartes ziehen auf 0V oder hochohmig (mit Pullup dann plötzlich high)
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Pinmodi}
+	\emph{GPIO\_PuPd} kümmert sich um die Pullups/Downs:
+	\begin{itemize}
+		\item \emph{GPIO\_PuPd\_NOPULL} -- Kein Pullup/down
+		\item \emph{GPIO\_PuPd\_UP} -- Pullup an
+		\item \emph{GPIO\_PuPd\_DOWN} -- Pulldown an
+	\end{itemize}
+\end{frame}
+
+
+\subsection{Interrupts durch GPIOs}
+
+\begin{frame} [fragile]
+	\frametitle{Pinmodi}
+	Anstatt die ganze Zeit die Pins abzufragen, ob da was passiert ist, können sie auch Interrupts werfen. Sample dazu ist \emph{04\_gpiointerrupt}.
+\end{frame}
+
+\begin{frame} [fragile]
+	\frametitle{GPIO Interrupts}
+	Pin konfigurieren wie sonst auch. PA0 ist der User-Button, auf der Platine ist ein Pullup-Widerstand. Bonuspunkte für Leute die ihn mir im Schaltplan raussuchen und mir sagen wie er heisst und wie groß er ist.
+	\begin{lstlisting} [language=C]
+	//Clock einschalten
+	RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA, ENABLE);
+
+	// Pinmodus konfigurieren
+	GPIO_Init(GPIOA, &(GPIO_InitTypeDef){
+		.GPIO_Speed = GPIO_Speed_50MHz,
+		.GPIO_Mode = GPIO_Mode_IN,
+		.GPIO_OType = GPIO_OType_PP,
+		.GPIO_PuPd = GPIO_PuPd_NOPULL,	//no internal pullup or pulldown, is present on PCB
+		.GPIO_Pin = GPIO_Pin_0
+	});
+	\end{lstlisting}
+\end{frame}
+
+\begin{frame} [fragile]
+	\frametitle{GPIO Interrupts}
+	GPIO Interrupts werden durch den EXTI-Kern behandelt. Konfigurieren...
+	\begin{lstlisting} [language=C]
+	EXTI_Init(&(EXTI_InitTypeDef){
+		.EXTI_Line = EXTI_Line0,
+		.EXTI_Mode = EXTI_Mode_Interrupt,
+		.EXTI_Trigger = EXTI_Trigger_Rising,
+		.EXTI_LineCmd = ENABLE
+	});
+	\end{lstlisting}
+	Was geht da? Ich bin faul findets selbst raus ;) \emph{STM32 Reference Manual Page 199ff}
+\end{frame}
+
+\begin{frame} [fragile]
+	\frametitle{GPIO Interrupts}
+	Nur soviel: 
+	\begin{itemize}
+		\item Es gibt 16 Leitungen im Chip: EXTI0 bis EXTI15
+		\item An EXTI0 hängen: PA0, PB0, PC0, PD0, ..., PI0
+		\item An EXTI1 hängen: PA1, PB1, PC1, PD1, ..., PI1
+		\item ... klar, oder?
+		\item Wir haben hier aber EXTI0 konfiguriert. Wie kriegen wir jetzt also PA0 and EXTI0?
+	\end{itemize}
+	\pause
+	So:
+	\begin{lstlisting} [language=C, basicstyle=\small]
+	SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOA, EXTI_PinSource0);
+	\end{lstlisting}
+\end{frame}
+
+\begin{frame} [fragile]
+	\frametitle{GPIO Interrupts}
+	Als letztes müssen wir den Interrupt im Interrupt-Controller noch einschalten:
+	\begin{lstlisting} [language=C, basicstyle=\small]
+	NVIC_Init(&(NVIC_InitTypeDef){
+		.NVIC_IRQChannel = EXTI0_IRQn,
+		.NVIC_IRQChannelPreemptionPriority = 0x00,	//lowest priority possible
+		.NVIC_IRQChannelSubPriority = 0x00,
+		.NVIC_IRQChannelCmd = ENABLE
+	});
+	\end{lstlisting}
+\end{frame}
+
+\begin{frame} [fragile]
+	\frametitle{GPIO Interrupts}
+	Und so sieht die Interruptroutine aus:
+	\begin{lstlisting} [language=C, basicstyle=\small]
+void EXTI0_IRQHandler()
+{
+	//huh? You talking to me?
+	if(EXTI_GetITStatus(EXTI_Line0) != RESET)
+	{
+		GPIO_ToggleBits(GPIOD, GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15);
+
+		//Clear the interrupt bit and tell the controller we handlet the interrupt
+		EXTI_ClearITPendingBit(EXTI_Line0);
+	}
+}
+	\end{lstlisting}
+\end{frame}
+
+\begin{frame} [fragile]
+	\frametitle{GPIO Interrupts}
+	War viel? Keine Sorge, guckt ins Example 01 bis 04. Da steht alles kommentiert und zusammen in jeweils einem File.
+\end{frame}
+
+
+\section{Timer}
+
+\subsection{Timer}
+
+
+
+\section{Aufgaben}
+\subsection{Aufgaben}
+\begin{frame}
+	\frametitle{Aufgaben}
+	\begin{enumerate}
+		\item Versucht mal selbst die LEDs zum Blinken zu bringen (also selbst Pinmodi konfigurieren etc.)
+		\item Versucht mal den Input für den Userbutton richtig zu konfigurieren und Dinge damit zu tun
+		\item Probiert auch mal die Interrupts aus
+		\item Was fällt euch auf, wenn ihr den Taster drückt? Wie oft wird eure programmierte Aktion pro Druck ausgelöst?
+		\item Behebt das festgestellte Problem (entprellen)! Wie ist mir egal ;)
+
+		\item Konfiguriert mal einen Timer und lasst ihn mit einer von euch festgelegten Frequenz ticken (Ohne Output Compare oder son Kram, nur der Timer)
+		\item Spielt mal mit den Comparewerten in dem LED-PWM example und guckt was sich ändert. Ich komm dann mal mit nem Logicanalyzer rum und zeig auch live wie das aussieht.
+		\item Wenn es euch interessiert, stellt den Timer mal so ein, dass er alle x millisekunden überläuft und probiert mal in einem zweiten Schritt einen Interrupt bei einem Timer-Overflow zu erzeugen. Damit könnt ihr jetzt relativ genau Zeit messen und wisst, wie die Delay()-Funktion funktioniert ;)
+	\end{enumerate}
+\end{frame}
+
+
+\end{document}
