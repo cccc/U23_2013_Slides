@@ -4,6 +4,7 @@ slides.pdf: slides.tex \
 	Pullup.png \
 	Pulldown.png \
 	keinpullupdown.png \
+	01-timer.png \
 	beamercolorthemec4.sty \
  	beamerouterthemec4.sty \
  	c4-logo.jpg

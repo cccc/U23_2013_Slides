@@ -14,6 +14,7 @@
 \usepackage{fontspec}
 \usepackage{listings}
 \usepackage{color}
+\usepackage{mathtools}
 
 % Multimedia
 %\usepackage{multimedia}
@@ -131,7 +132,7 @@ http://koeln.ccc.de \\
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
 	\end{lstlisting}
 	\pause
-	... als Ausgänge
+	... als Ausgänge ...
 	\begin{lstlisting} [language=C, basicstyle=\small]
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
 	\end{lstlisting}
@@ -144,12 +145,12 @@ http://koeln.ccc.de \\
 
 \begin{frame} [fragile]
 	\frametitle{Der Reihe nach (3)}
-	... mit aktiviertem Pullup (eigentlich sinnfrei bei Ausgängen) ...
+	... mit aktiviertem Pullup (eigentlich sinnfrei bei Push-Pull-Ausgängen) ...
 	\begin{lstlisting} [language=C, basicstyle=\small]
 	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
 	\end{lstlisting}
 	\pause
-	... und max. 50 MHz Geschwindigkeit
+	... und max. 50 MHz Geschwindigkeit.
 	\begin{lstlisting} [language=C, basicstyle=\small]
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	\end{lstlisting}
@@ -244,7 +245,7 @@ http://koeln.ccc.de \\
 
 \subsection{Interrupts durch GPIOs}
 
-\begin{frame} [fragile]
+\begin{frame}
 	\frametitle{Pinmodi}
 	Anstatt die ganze Zeit die Pins abzufragen, ob da was passiert ist, können sie auch Interrupts werfen. Sample dazu ist \emph{04\_gpiointerrupt}.
 \end{frame}
@@ -314,17 +315,17 @@ http://koeln.ccc.de \\
 \begin{frame} [fragile]
 	\frametitle{GPIO Interrupts}
 	Und so sieht die Interruptroutine aus:
-	\begin{lstlisting} [language=C, basicstyle=\small]
+	\begin{lstlisting} [language=C, basicstyle=\small, breaklines=true]
 void EXTI0_IRQHandler()
 {
-	//huh? You talking to me?
-	if(EXTI_GetITStatus(EXTI_Line0) != RESET)
-	{
-		GPIO_ToggleBits(GPIOD, GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15);
+    //huh? You talking to me?
+    if(EXTI_GetITStatus(EXTI_Line0) != RESET)
+    {
+        GPIO_ToggleBits(GPIOD, GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15);
 
-		//Clear the interrupt bit and tell the controller we handlet the interrupt
-		EXTI_ClearITPendingBit(EXTI_Line0);
-	}
+        //Clear the interrupt bit and tell the controller we handled the interrupt
+        EXTI_ClearITPendingBit(EXTI_Line0);
+    }
 }
 	\end{lstlisting}
 \end{frame}
@@ -339,22 +340,192 @@ void EXTI0_IRQHandler()
 
 \subsection{Timer}
 
+\begin{frame}
+	\frametitle{Timer}
+	\begin{itemize}
+		\item Timer sind vom Konzept her relativ einfach, aber durch die vielfältigen Anwendungsgebiete doch relativ komplexe Biester
+		\item Deswegen werden wir hier das Thema nur kurz anschneiden (wie leider fast alles -\_-)
+		\item Ich beherrsche auch nicht alle Modi auswendig, mit Grundverständnis und etwas Googlen + Datasheets kommt man aber ganz gut hin
+		\item Timer sind simpel: Sie haben ein x Bit breites Register und bei jedem Auftreten eines Clockimpulses wird das register inkrementiert
+		\item Kühles Howto zum nachlesen: \url{http://visualgdb.com/tutorials/arm/stm32/timers/}
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Timer}
+	Annahme: 16 Bit Timer, 40 MHz Clock, wie lange tickt das Ding, bis es überläuft?
+	\begin{itemize}
+		\item $2^{16} = 65536$, Wertebereich des Timers als 0 bis 65535
+		\item $40MHz = 40*{10}^{6}$ Ticks pro Sekunde = 40 000 000 Hz
+		\item Der Timer inkrementiert also 40000000 pro Sekunde
+		\item Damit läuft der Timer als $40000000MHz/65536 = 610,3515625$ pro Sekunde über
+		\item Somit ist $1s/610,3515625 = 0,0016384s = 1,6384ms$
+		\pause
+		\item \textbf{Würde man also einen 16 Bit Timer mit 40MHz von 0 an laufen lassen, hat man einen Überlauf alle 1,6384ms}
+		\pause
+		\item Rechnet mal, wie lange ein 32 Bit Timer bei 100 MHz braucht, bis der überläuft!
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Timer}
+	\includegraphics[height=1.7in]{01-timer.png} \\
+	\footnotesize{Quelle: \url{http://visualgdb.com/tutorials/arm/stm32/timers/}}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Timer}
+	Allgemeine Formeln
+	\begin{itemize}
+		\item $tickDauer = \frac{1}{timerFrequenz}$
+		\item $zeitBis"Uberlauf = z"ahlSchritte * tickDauer$
+	\end{itemize}
+	Die Dinger sind so einfach, dass man sich die mit etwas Übung auch schnell selbst herleiten kann.
+\end{frame}
+
+\begin{frame}
+	\frametitle{STM32 Timer}
+	Welche Timer haben wir denn und wie schnell ticken die wirklich?
+	\begin{itemize}
+		\item Dieses clocking Excelsheet in \emph{docs/} verrät euch das
+		\item TIM 1 und 8: 16 Bit
+		\item TIM 2 bis 5: 16 Bit und 32 Bit
+		\item TIM 9 bis 14: 16 Bit
+		\item TIM 6 und 7: 16 Bit
+		\item Verschiedene Timer haben verschiedene Features
+		\item Wie immer alles im Datasheet
+	\end{itemize}
+\end{frame}
+
+\begin{frame} [fragile]
+	\frametitle{Timer konfigurieren}
+	Wir konfigurieren mal einen Timer im sogenannten TimeBase Modus (geklaut aus \emph{05\_ledpwm}).
+	\begin{lstlisting} [language=C]
+//Enable Timer 4 clock
+RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
+
+//We want the timer to tick with a frequency of 1MHz, calculate a prescaler
+uint32_t PrescalerValue = (uint16_t) ((SystemCoreClock / 2) / 1000000) - 1;
+
+//20 kHz PWM period (i.e. 50uS period)
+uint32_t period = 1000000 / 20000;
+
+//Configure the timer
+TIM_TimeBaseInit(TIM4, &(TIM_TimeBaseInitTypeDef){
+	.TIM_Period = period - 1,
+	.TIM_Prescaler = PrescalerValue,
+	.TIM_ClockDivision = 0,
+	.TIM_CounterMode = TIM_CounterMode_Up,
+});
+	\end{lstlisting}
+	Das Ding tickt einfach nur mit der angegebenen Frequenz vor sich hin. Mehr passiert da nicht.
+\end{frame}
+
+\begin{frame} [fragile]
+	\frametitle{Timer konfigurieren}
+Als letztes noch den Timer starten:
+	\begin{lstlisting} [language=C, basicstyle=\small]
+TIM_Cmd(TIM4, ENABLE);
+	\end{lstlisting}
+	Tick, tack... \\
+\pause
+Aktuellen Tickwert holen:
+\begin{lstlisting} [language=C, basicstyle=\small]
+TIM_GetCounter(TIM4);
+	\end{lstlisting}
+\end{frame}
+
+\subsection{PWM}
+
+\begin{frame}
+	\frametitle{PWM}
+	\begin{itemize}
+		\item Jetzt, wo wir wissen, wie Timer generell funktionieren, lassen wir mal LEDs flackern
+		\item Helligkeit von LEDs wird über PWM (= Pulse Width Modulation = Pulsweitenmodulation) ermöglicht
+		\item Zu gut Deutsch: LED ist X\% der Gesamtzeit an und 100\%-X\% der Gesamtzeit aus
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{PWM}
+	\begin{itemize}
+		\item Fürs messen von Zeiten nehmen wir immer Timer auf einem Mikrocontroller
+		\item Wir machen die LED an, fangen bei 0 an zu Zählen und warten etwas
+		\item Wenn der Timer einen gewissen Wert erreicht hat (= gewisse Zeit verstrichen ist), machen wir die LED wieder aus ...
+		\item ... und warten, bis der Timer überläuft
+		\item Wenn man das schnell genug macht, sieht man das als Mensch durch die Trägheit der Augen nichtmal
+		\item Repeat...
+		\pause
+		\item Easy, oder?
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{PWM}
+	Rechenbeispiel:
+	\begin{itemize}
+		\item Eine Timerperiode ist 50µS lang
+		\item Angenommen der Timer zählt innerhalb dieser 50µS immer bis 50 und wird dann wieder auf 0 zurückgesetzt ...
+		\item ... und wir setzen den OutputCompare auf 25, ist 50\% der Zeit die LED an, sonst aus
+		\item Bei 10 wären das 5µS an und den die Restlichen 45µS aus
+	\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Output Compare Config}
+	Ich kopier mal wieder Code (\emph{05\_ledpwm}):
+	\begin{lstlisting} [language=C, breaklines=true]
+//PD12 auf Alternate Function legen (Achtung! Bei GPIO Config auch AF als Mode angeben!)
+GPIO_PinAFConfig(GPIOD, GPIO_PinSource12, GPIO_AF_TIM4);
+
+//Timer konfigurieren, so das er passend tickt
+<...>
+
+TIM_OCInitTypeDef TIM_OCInitStructure;
+TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
+TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
+TIM_OCInitStructure.TIM_Pulse = 0;
+TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
+
+// PWM1 Mode configuration: Channel1 (GPIOD Pin 12)
+TIM_OC1Init(TIM4, &TIM_OCInitStructure);
+TIM_OC1PreloadConfig(TIM4, TIM_OCPreload_Enable);
+
+// Comparewert setzen
+TIM_SetCompare1(TIM4, 10);
+	\end{lstlisting}
+\end{frame}
+
+
 
 
 \section{Aufgaben}
 \subsection{Aufgaben}
 \begin{frame}
-	\frametitle{Aufgaben}
+	\frametitle{GPIO-Aufgaben}
 	\begin{enumerate}
 		\item Versucht mal selbst die LEDs zum Blinken zu bringen (also selbst Pinmodi konfigurieren etc.)
 		\item Versucht mal den Input für den Userbutton richtig zu konfigurieren und Dinge damit zu tun
 		\item Probiert auch mal die Interrupts aus
 		\item Was fällt euch auf, wenn ihr den Taster drückt? Wie oft wird eure programmierte Aktion pro Druck ausgelöst?
 		\item Behebt das festgestellte Problem (entprellen)! Wie ist mir egal ;)
+	\end{enumerate}
+\end{frame}
 
-		\item Konfiguriert mal einen Timer und lasst ihn mit einer von euch festgelegten Frequenz ticken (Ohne Output Compare oder son Kram, nur der Timer)
+\begin{frame}
+	\frametitle{Timer-Aufgaben}
+	\begin{enumerate}
+		\item Konfiguriert mal einen Timer im TimeBase-Mode und lasst ihn mit einer von euch festgelegten Frequenz ticken (also ohne Output Compare oder son Kram, nur der Timer)
+		\item Wenn das geht, könnt ihr in einer Schleife regelmäßig den Wert auslesen und ab einem Schwellwert ne LED an- und ausschalten -> Blinkerei! (siehe auch: \url{http://visualgdb.com/tutorials/arm/stm32/timers/})
 		\item Spielt mal mit den Comparewerten in dem LED-PWM example und guckt was sich ändert. Ich komm dann mal mit nem Logicanalyzer rum und zeig auch live wie das aussieht.
-		\item Wenn es euch interessiert, stellt den Timer mal so ein, dass er alle x millisekunden überläuft und probiert mal in einem zweiten Schritt einen Interrupt bei einem Timer-Overflow zu erzeugen. Damit könnt ihr jetzt relativ genau Zeit messen und wisst, wie die Delay()-Funktion funktioniert ;)
+	\end{enumerate}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Timer-Aufgaben}
+	\begin{enumerate}
+		\setcounter{enumi}{3}
+		\item Wenn es euch interessiert, stellt den Timer mal so ein, dass er alle x Millisekunden überläuft und probiert mal in einem zweiten Schritt einen Interrupt bei einem Timer-Overflow zu erzeugen (Hints: \emph{TIM\_ITConfig()}, \emph{TIMx\_IRQHandler()}, \emph{TIM\_ClearITPendingBit()}, \emph{TIM\_GetITStatus()}). Damit könnt ihr jetzt relativ genau Zeit messen und wisst, wie die Delay()-Funktion funktioniert ;)
 	\end{enumerate}
 \end{frame}
 
