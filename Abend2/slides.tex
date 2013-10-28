@@ -246,7 +246,7 @@ http://koeln.ccc.de \\
 \subsection{Interrupts durch GPIOs}
 
 \begin{frame}
-	\frametitle{Pinmodi}
+	\frametitle{GPIO Interrupts}
 	Anstatt die ganze Zeit die Pins abzufragen, ob da was passiert ist, können sie auch Interrupts werfen. Sample dazu ist \emph{04\_gpiointerrupt}.
 \end{frame}
 
@@ -279,7 +279,7 @@ http://koeln.ccc.de \\
 		.EXTI_LineCmd = ENABLE
 	});
 	\end{lstlisting}
-	Was geht da? Ich bin faul findets selbst raus ;) \emph{STM32 Reference Manual Page 199ff}
+	Was geht da? Ich bin faul findet das zur Abwechslung mal selbst raus ;) \emph{STM32 Reference Manual Page 199ff}
 \end{frame}
 
 \begin{frame} [fragile]
@@ -303,12 +303,12 @@ http://koeln.ccc.de \\
 	\frametitle{GPIO Interrupts}
 	Als letztes müssen wir den Interrupt im Interrupt-Controller noch einschalten:
 	\begin{lstlisting} [language=C, basicstyle=\small]
-	NVIC_Init(&(NVIC_InitTypeDef){
-		.NVIC_IRQChannel = EXTI0_IRQn,
-		.NVIC_IRQChannelPreemptionPriority = 0x00,	//lowest priority possible
-		.NVIC_IRQChannelSubPriority = 0x00,
-		.NVIC_IRQChannelCmd = ENABLE
-	});
+    NVIC_Init(&(NVIC_InitTypeDef){
+        .NVIC_IRQChannel = EXTI0_IRQn,
+        .NVIC_IRQChannelPreemptionPriority = 0x00,
+        .NVIC_IRQChannelSubPriority = 0x00,
+        .NVIC_IRQChannelCmd = ENABLE
+    });
 	\end{lstlisting}
 \end{frame}
 
@@ -508,7 +508,7 @@ TIM_SetCompare1(TIM4, 10);
 		\item Versucht mal den Input für den Userbutton richtig zu konfigurieren und Dinge damit zu tun
 		\item Probiert auch mal die Interrupts aus
 		\item Was fällt euch auf, wenn ihr den Taster drückt? Wie oft wird eure programmierte Aktion pro Druck ausgelöst?
-		\item Behebt das festgestellte Problem (entprellen)! Wie ist mir egal ;)
+		\item Behebt das festgestellte Problem (entprellen)! Wie ist mir egal.
 	\end{enumerate}
 \end{frame}
 
@@ -525,9 +525,16 @@ TIM_SetCompare1(TIM4, 10);
 	\frametitle{Timer-Aufgaben}
 	\begin{enumerate}
 		\setcounter{enumi}{3}
-		\item Wenn es euch interessiert, stellt den Timer mal so ein, dass er alle x Millisekunden überläuft und probiert mal in einem zweiten Schritt einen Interrupt bei einem Timer-Overflow zu erzeugen (Hints: \emph{TIM\_ITConfig()}, \emph{TIMx\_IRQHandler()}, \emph{TIM\_ClearITPendingBit()}, \emph{TIM\_GetITStatus()}). Damit könnt ihr jetzt relativ genau Zeit messen und wisst, wie die Delay()-Funktion funktioniert ;)
+		\item Wenn es euch interessiert, stellt den Timer mal so ein, dass er alle x Millisekunden überläuft und probiert mal in einem zweiten Schritt einen Interrupt bei einem Timer-Overflow zu erzeugen (Hints: \emph{TIM\_ITConfig()}, \emph{TIMx\_IRQHandler()}, \emph{TIM\_ClearITPendingBit()}, \emph{TIM\_GetITStatus()}). Damit könnt ihr jetzt relativ genau Zeit messen und wisst, wie die Delay()-Funktion funktioniert
 	\end{enumerate}
 \end{frame}
 
+\begin{frame}
+	\frametitle{Sonstiges}
+	\begin{itemize}
+		\item Letztes mal wollte jemand wissen, was das EVENTOUT das bei den meisten Pins als auxiliary function zu sehen war bedeutet. Hier stehts: \url{http://electronics.stackexchange.com/questions/28740/what-is-the-stm32-event-eventout}
+		\item Spielt mal damit, wenn ihr Lust habt, das hört sich lustig an!
+	\end{itemize}
+\end{frame}
 
 \end{document}
