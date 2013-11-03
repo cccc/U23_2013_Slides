@@ -26,9 +26,9 @@
 
 \lstset{basicstyle=\tiny\ttfamily,
 	showspaces=false,
-	showtabs=false, 
-	showstringspaces=false, 
-	columns=fullflexible, 
+	showtabs=false,
+	showstringspaces=false,
+	columns=fullflexible,
 	stringstyle=\color{sh_string},
 	keywordstyle=\color{sh_keyword}\bfseries,
 	commentstyle=\color{sh_comment}\itshape
@@ -185,17 +185,17 @@ void gpiospi_write_int32(uint32_t data)
   {
     // Get current bit
     uint32_t bit = data & (0x1<<i);
-    
+
     // Set Data
     GPIO_WriteBit(GPIOB, GPIO_Pin_15, bit ? SET : RESET); // Data
     GPIO_WriteBit(GPIOD, GPIO_Pin_15, bit ? SET : RESET); // LED
     wait_own(wait_data);
-    
+
     // Set clock high
     GPIO_WriteBit(GPIOB, GPIO_Pin_13, SET); // Clock
     GPIO_WriteBit(GPIOD, GPIO_Pin_13, SET); // LED
     wait_own(wait_data);
-    
+
     // Set clock low
     GPIO_WriteBit(GPIOB, GPIO_Pin_13, RESET); // Clock
     GPIO_WriteBit(GPIOD, GPIO_Pin_13, RESET); // LED

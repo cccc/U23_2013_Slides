@@ -25,9 +25,9 @@
 
 \lstset{basicstyle=\tiny\ttfamily,
 	showspaces=false,
-	showtabs=false, 
-	showstringspaces=false, 
-	columns=fullflexible, 
+	showtabs=false,
+	showstringspaces=false,
+	columns=fullflexible,
 	stringstyle=\color{sh_string},
 	keywordstyle=\color{sh_keyword}\bfseries,
 	commentstyle=\color{sh_comment}\itshape
@@ -113,7 +113,7 @@ http://koeln.ccc.de \\
 			\column{1.5in}
 				\begin{itemize}
 				\item STM32F407VGT6 32-bit ARM Cortex-M4F
-				\item 1 MB Flash 
+				\item 1 MB Flash
 				\item 192 KB RAM (64KB CCM, 128KB SRAM)
 				\item JTAG via ST-Linkv2
 				\item USB OTG
@@ -259,16 +259,16 @@ http://koeln.ccc.de \\
 \begin{frame} [fragile]
 	\frametitle{Debuggen via gdb}
 		\begin{lstlisting}
-		$ ./debug.sh 
+		$ ./debug.sh
 Connection to STM32 established. You can start debugging now
-Ctrl+C or unplug USB to kill Connection 
+Ctrl+C or unplug USB to kill Connection
 		\end{lstlisting}
 \end{frame}
 
 \begin{frame} [fragile]
 Auf anderer Shell:
 	\begin{lstlisting}
-$ arm-none-eabi-gdb u23_lib/examples/01_leds/obj/01_leds.elf 
+$ arm-none-eabi-gdb u23_lib/examples/01_leds/obj/01_leds.elf
 GNU gdb (GNU Tools for ARM Embedded Processors) 7.4.1.20130312-cvs
 [... license bla bla ...]
 Reading symbols from /home/andy/Documents/CCC/U23_2013/examples/u23_lib/examples/01_leds/obj/01_leds.elf...done.
@@ -279,7 +279,7 @@ Remote debugging using :3333
 
 (gdb) monitor reset init
 target state: halted
-target halted due to debug-request, current mode: Thread 
+target halted due to debug-request, current mode: Thread
 xPSR: 0x01000000 pc: 0x080004c4 msp: 0x10010000
 
 (gdb) b main
@@ -292,7 +292,7 @@ Note: automatically using hardware breakpoints for read-only addresses.
 Breakpoint 1, main () at /home/andy/Documents/CCC/U23_2013/examples/u23_lib/examples/01_leds/src/main.c:8
 8		InitializeSystem();
 
-(gdb) <weitere Befehle> 
+(gdb) <weitere Befehle>
 [...]
 	\end{lstlisting}
 	Alternativ Eclipse. Gordin? Ach, sowas will doch niemand...
@@ -499,7 +499,7 @@ nothing added to commit but untracked files present (use "git add" to track)
 		\item Löscht eine Datei
 	\end{itemize}
 	\begin{lstlisting}
-~ git rm testfile 
+~ git rm testfile
 rm 'testfile'
 	\end{lstlisting}
 \end{frame}
