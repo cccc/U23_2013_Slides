@@ -1,0 +1,57 @@
+\ProvidesPackageRCS $Header: /cvsroot/latex-beamer/latex-beamer/themes/color/beamercolorthemec4.sty,v 1.8 2004/10/28 17:15:51 tantau Exp $
+
+% Copyright 2003 by Till Tantau <tantau@users.sourceforge.net>.
+% Modified by Corinna Habets <ch@corinna-habets.de> August 2006 for koeln.ccc.de
+%
+% This program can be redistributed and/or modified under the terms
+% of the GNU Public License, version 2.
+
+\mode<presentation>
+
+\definecolor{c4orange}{RGB}{252,187,6}
+\definecolor{c4blue}{RGB}{85,123,168}
+\definecolor{c4lightblue}{RGB}{161,185,207}
+\definecolor{c4darkgrey}{RGB}{80,80,80}
+
+\definecolor{white}{RGB}{255,255,255}
+\definecolor{black}{RGB}{0,0,0}
+
+%\definecolor{red}{RGB}{255,0,0}
+%\definecolor{green}{RGB}{0,255,0}
+%\definecolor{blue}{RGB}{0,0,255}
+
+\setbeamercolor{structure}{fg=c4blue}
+
+\setbeamercolor{palette primary}{fg=c4blue,bg=c4orange} %nicht gesehen
+\setbeamercolor{palette secondary}{fg=c4darkgrey,bg=c4orange!90} %zweitoberster und zweitunterster
+\setbeamercolor{palette tertiary}{fg=white,bg=c4blue!90} % oberster und unterster
+\setbeamercolor{palette quaternary}{fg=c4darkgrey,bg=white} %breiter
+
+\setbeamercolor{titlelike}{fg=c4darkgrey,bg=white}
+
+\setbeamercolor{block title}{fg=white,bg=c4blue}
+%\setbeamercolor{block title alerted}{use=alerted text,fg=c4darkgrey,bg=example text.fg!75!bg}
+%\setbeamercolor{block title example}{use=example text,fg=c4darkgrey,bg=example text.fg!100!bg}
+%\setbeamercolor{example text}{fg=c4orange!100!c4blue}
+\setbeamercolor{block body alerted}{bg=normal text.bg!25!c4orange}
+\setbeamercolor{block body example}{bg=normal text.bg!25!c4lightblue}
+\setbeamercolor{block title alerted}{use={normal text,alerted text},fg=normal text.fg!0!c4darkgrey,bg=normal text.bg!25!c4orange}
+\setbeamercolor{block title example}{use={normal text,example text},fg=normal text.fg!0!c4darkgrey,bg=normal text.bg!25!c4lightblue}
+\setbeamercolor{block title example}{use=example text,fg=c4lightblue,bg=example text.fg!75!bg}
+
+\setbeamercolor{block body}{parent=normal text,use=block title,bg=block title.bg!25!bg}
+\setbeamercolor{block body alerted}{parent=normal text,use=block title alerted,bg=block title alerted.bg!25!bg}
+\setbeamercolor{block body example}{parent=normal text,use=block title example,bg=block title example.bg!25!bg}
+
+%\setbeamercolor{sidebar}{bg=c4orange!70}
+
+%\setbeamercolor{palette sidebar primary}{fg=c4blue}
+%\setbeamercolor{palette sidebar secondary}{fg=c4blue!75}
+%\setbeamercolor{palette sidebar tertiary}{fg=c4blue!75}
+%\setbeamercolor{palette sidebar quaternary}{fg=c4blue}
+
+%\setbeamercolor*{separation line}{}
+%\setbeamercolor*{fine separation line}{}
+
+\mode
+<all>
