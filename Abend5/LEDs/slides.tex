@@ -15,6 +15,7 @@
 \usepackage{listings}
 \usepackage{color}
 \usepackage{mathtools}
+\usepackage[output-decimal-marker={,}]{siunitx}
 
 % Multimedia
 %\usepackage{multimedia}
@@ -93,9 +94,11 @@ http://koeln.ccc.de \\
 		\item Spannung dran - Licht an
 		\item Spannung weg - Licht aus
 		\item Ein bisschen komplizierter:
-		\item Strom da - Licht an
-		\item Strom weg - Licht aus
-		\item Viel Strom da - Licht kurz an
+		\begin{itemize}
+			\item Strom da - Licht an
+			\item Strom weg - Licht aus
+			\item Viel Strom da - Licht kurz an
+		\end{itemize}
 	\end{itemize}
 \end{frame}
 
@@ -104,7 +107,7 @@ http://koeln.ccc.de \\
 	\begin{itemize}
 		\item LEDs verbrauchen eine gewisse Spannung (je nach Farbe)
 		\item Brauchen einen gewissen Strom
-		\item normalerweise 20 mA
+		\item normalerweise \SI{20}{\milli\ampere}
 		\item Es gibt auch High / Low Power LEDs
 	\end{itemize}
 \end{frame}
@@ -113,10 +116,10 @@ http://koeln.ccc.de \\
 	\frametitle{Ansteuerung}
 	\begin{itemize}
 		\item Um den Strom einzustellen braucht man einen Vorwiderstand
-		\item Den berechnet man mit $U = R * I$:
-		\item $V_{cc} = U_R + U_D$
-		\item $U_R = I_R * R_R$
-		\item $\rightarrow R_R = (V_{cc} - U_D) / I$
+		\item Den berechnet man mit $U = R \cdot I$:
+		\item $U_{ges} = U_R + U_D$
+		\item $U_R = I \cdot R_V$
+		\item $\Rightarrow R_V = (U_{ges} - U_D) / I$
 	\end{itemize}
 	\includegraphics[width=0.8in]{vorwid.png}
 \end{frame}
@@ -129,7 +132,7 @@ http://koeln.ccc.de \\
 		\item LEDs sind sehr empfindlich gegenüber dem Strom
 		\begin{itemize}
 			\item Bei kleinem Strom leuchten sie schwach
-			\item Bei schon wenig mehr als 20 mA brennen sie durch
+			\item Bei schon wenig mehr als \SI{20}{\milli\ampere} brennen sie durch
 		\end{itemize}
 		\item Wir werden beide Probleme angehen.
 	\end{itemize}
@@ -145,14 +148,14 @@ http://koeln.ccc.de \\
 	\frametitle{(Bipolare NPN-) Transistoren}
 	\begin{itemize}
 		\item Benutzt man als elektronische Schalter
-		\item Hauptsächlich sind sie aber Stromverstärker
+		\item Hauptsächlich sind sie aber Stromregler
 	\end{itemize}
 	\includegraphics[width=2in]{transistor.png}
 	\begin{itemize}
-		\item Über CE kann maximal $\beta$ (normalerweise \~ 100) mal so viel
+		\item Über CE kann maximal $\beta$ (normalerweise \sim 100) mal so viel
 			Strom fließen, wie über BE.
 		\item Erste Anwendung: Macht man $I_{BE}$ groß genug, wird $I_{CE}$
-			nicht beeinträchtigt $\rightarrow$ elektronischer Schalter.
+			nicht beeinträchtigt $\Rightarrow$ elektronischer Schalter.
 	\end{itemize}
 \end{frame}
 
@@ -161,9 +164,9 @@ http://koeln.ccc.de \\
 \begin{frame}
 	\frametitle{Elektronischer Schalter}
 	\begin{itemize}
-		\item Beim Schalten (wechseln) ist der Trnasistor kurz in einem
+		\item Beim Schalten (wechseln) ist der Transistor kurz in einem
 			Überlastbereich
-		\item Man will den Steuerstrom \~ 10 mal höher einstellen als benötigt
+		\item Man will den Steuerstrom \sim 10 mal höher einstellen als benötigt
 	\end{itemize}
 \end{frame}
 
@@ -173,7 +176,7 @@ http://koeln.ccc.de \\
 	\begin{itemize}
 		\item Links: Widerstand stellt den Steuerstrom ein
 		\item Rechts: Lastkreis
-		\item Basiswiderstand: $R_B = V_{CC} / I_B$
+		\item Basiswiderstand: $R_V = (U_e - \SI{0,7}{\volt}) / I_{BE}$
 	\end{itemize}
 \end{frame}
 
@@ -182,8 +185,8 @@ http://koeln.ccc.de \\
 	\begin{itemize}
 		\item Dioden lassen Strom nur in eine Richtung durch
 		\item An Dioden fallen immer\footnote{Abhängig vom Material
-			(Germanium $0,3V$), Temperatur und natürlich nicht mehr als die angelegte
-			Spannung.} $0,7 V$ ab.
+			(Germanium \SI{0,3}{\volt}), Temperatur und natürlich nicht mehr als die angelegte
+			Spannung.} \SI{0,7}{\volt} ab.
 	\end{itemize}
 	\includegraphics[width=1in]{diod.png}
 \end{frame}
@@ -202,10 +205,10 @@ http://koeln.ccc.de \\
 	\frametitle{Konstantstromquelle 2}
 	\includegraphics[width=1in]{konst2.png}
 	\begin{itemize}
-		\item Links: Dioden machen Referenzspannung $1,4 V$
-		\item BE wirkt wie eine Diode ($\rightarrow 0,7 V$)
+		\item Links: Dioden machen Referenzspannung \SI{1,4}{\volt}
+		\item BE wirkt wie eine Diode ($\rightarrow \SI{0,7}{\volt}$)
 		\item Mit $R_E$ stellt man den Konstantstrom ein:
-		\item $I_L = U_{RE} / R_E = 0.7 V / R_E$
+		\item $I_L \approx U_{RE} / R_E = \SI{0,7}{\volt} / R_E$
 		\item Den Querstrom will man etwa 10 mal größer als benötigt haben.
 	\end{itemize}
 \end{frame}
