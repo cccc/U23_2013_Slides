@@ -2,7 +2,7 @@ all: slides.pdf
 
 slides.pdf: slides.tex \
 	stm32f4_discovery.jpg \
-	board.png \
+	stm32f4_discovery_beschriftet.png \
  	beamercolorthemec4.sty \
  	beamerouterthemec4.sty \
  	c4-logo.jpg
